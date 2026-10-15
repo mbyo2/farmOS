@@ -1,0 +1,7 @@
+name: Zambia conservation farming
+description: Provides log category terms for conservation farming practices promoted in Zambia.
+type: module
+package: farmOS Zambia
+core_version_requirement: ^11
+dependencies:
+  - farm:farm_log_category

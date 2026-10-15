@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Install functions for the Zambia crops module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
+
+/**
+ * Implements hook_install().
+ *
+ * Creates default plant type terms for crops commonly grown in Zambia.
+ * Terms are only created if they do not already exist, so reinstalling
+ * the module (or enabling it on a site that already has some of these
+ * crops) will not create duplicates.
+ */
+function farm_zambia_crops_install(): void {
+
+  // Bail out if the plant_type vocabulary is not available.
+  if (!Vocabulary::load('plant_type')) {
+    return;
+  }
+
+  // Crop name => description (with Bemba/Nyanja local names where
+  // well-established).
+  $crops = [
+    'Maize' => "Zambia's staple crop, grown by the majority of smallholder farmers. Locally known as chimanga (Bemba/Nyanja).",
+    'Cassava' => 'Drought-tolerant root crop widely grown in northern Zambia. Locally known as tute (Bemba). An important food-security crop.',
+    'Groundnuts' => 'Major cash and food crop, especially in Eastern Province. Locally known as balemba (Bemba) or njugu (Nyanja).',
+    'Sorghum' => 'Drought-tolerant cereal suited to low-rainfall areas. Locally known as amasaka (Bemba) or mapila (Nyanja). Used for food and brewing.',
+    'Finger millet' => 'Traditional small grain grown in high-rainfall areas of northern Zambia. Valued for its nutrition and storage life.',
+    'Pearl millet' => 'Drought-tolerant cereal grown in the drier western and southern regions. An important food-security crop.',
+    'Soybeans' => 'Fast-growing cash crop, commonly rotated with maize to fix nitrogen. Locally known as soya.',
+    'Sunflower' => 'Oilseed cash crop grown across the central plateau. Processed locally for cooking oil.',
+    'Cotton' => 'Cash crop grown mainly in Eastern and Southern Provinces under outgrower schemes.',
+    'Tobacco' => 'Export cash crop grown in Eastern and Central Provinces, often under contract farming arrangements.',
+    'Sweet potatoes' => 'Versatile root crop grown countrywide for food and income. Locally known as mbatata (Nyanja).',
+    'Irish potatoes' => 'Grown mainly in cooler highland areas such as Mbala and the Copperbelt for fresh markets.',
+    'Beans' => 'Common beans grown widely as a protein source and cash crop, often intercropped with maize.',
+    'Cowpeas' => 'Drought-tolerant legume grown for grain and leaves. Locally known as nyemba.',
+    'Rice' => 'Grown in dambo (wetland) areas and under irrigation, mainly in Northern and Western Provinces. Locally known as mpunga.',
+    'Wheat' => 'Grown under irrigation in the dry season, mainly on commercial farms. Locally known as tirigu (Nyanja).',
+  ];
+
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($crops as $name => $description) {
+
+    // Skip terms that already exist in the plant_type vocabulary.
+    $existing = $storage->loadByProperties(['name' => $name, 'vid' => 'plant_type']);
+    if (!empty($existing)) {
+      continue;
+    }
+
+    $term = Term::create([
+      'name' => $name,
+      'vid' => 'plant_type',
+      'description' => $description,
+    ]);
+    $term->save();
+  }
+}

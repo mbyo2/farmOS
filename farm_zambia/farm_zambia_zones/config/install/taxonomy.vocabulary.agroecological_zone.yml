@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - farm_zambia_zones
+name: 'Agroecological zone'
+vid: agroecological_zone
+description: "Zambia's three agro-ecological regions (I, II, III), classified by annual rainfall."
+weight: 0
+new_revision: false

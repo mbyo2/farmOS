@@ -1,0 +1,7 @@
+name: Zambia agro-ecological zones
+description: Provides an agro-ecological zone vocabulary with Zambia's three agro-ecological regions.
+type: module
+package: farmOS Zambia
+core_version_requirement: ^11
+dependencies:
+  - drupal:taxonomy

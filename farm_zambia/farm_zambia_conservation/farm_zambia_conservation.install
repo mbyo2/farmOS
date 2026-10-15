@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Install functions for the Zambia conservation farming module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
+
+/**
+ * Implements hook_install().
+ *
+ * Creates default log category terms for conservation farming practices
+ * widely promoted in Zambia. Terms are only created if they do not already
+ * exist, so reinstalling will not create duplicates.
+ */
+function farm_zambia_conservation_install(): void {
+
+  // Bail out if the log_category vocabulary is not available.
+  if (!Vocabulary::load('log_category')) {
+    return;
+  }
+
+  // Practice name => description.
+  $practices = [
+    'Planting basins (Chololo)' => 'Hand-dug planting basins (chololo) that concentrate water, manure and fertilizer at the plant station. A cornerstone of conservation farming as promoted by the Conservation Farming Unit (CFU) in Zambia.',
+    'Minimum tillage / Ripping' => 'Ripping planting lines with an ox-drawn or tractor-drawn ripper instead of full ploughing. Disturbs only the planting row, preserving soil structure and moisture.',
+    'Crop rotation' => 'Rotating cereals with legumes (e.g. maize-soybean or maize-groundnut rotations) to fix nitrogen, break pest cycles and improve soil fertility.',
+    'Agroforestry (Faidherbia / Moringa)' => 'Integrating nitrogen-fixing trees such as Faidherbia albida (musangu) and Moringa oleifera into cropland for soil fertility, fodder, firewood and nutrition.',
+    'Mulching / Residue retention' => 'Leaving crop residues on the soil surface as mulch to retain moisture, suppress weeds and build soil organic matter, instead of burning.',
+  ];
+
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($practices as $name => $description) {
+
+    // Skip terms that already exist in the log_category vocabulary.
+    $existing = $storage->loadByProperties(['name' => $name, 'vid' => 'log_category']);
+    if (!empty($existing)) {
+      continue;
+    }
+
+    $term = Term::create([
+      'name' => $name,
+      'vid' => 'log_category',
+      'description' => $description,
+    ]);
+    $term->save();
+  }
+}
